@@ -35,4 +35,9 @@ class ChecklistRepository(private val remoteDataSource: RemoteDataSource) : IChe
 
     override suspend fun createChecklist(token: String, body: CreateChecklistBody) =
         remoteDataSource.createChecklist(token, body)
+
+    override suspend fun deleteChecklist(
+        token: String,
+        checklistId: Int
+    ) = remoteDataSource.deleteChecklist(token, checklistId)
 }

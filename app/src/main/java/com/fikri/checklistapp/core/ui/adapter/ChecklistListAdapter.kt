@@ -30,6 +30,10 @@ class ChecklistListAdapter(private val listChecklist: ArrayList<Checklist>) :
         holder.itemView.setOnClickListener {
             onItemClickCallback.onClickedItem(checklist)
         }
+
+        holder.binding.btnDeleteChecklist.setOnClickListener {
+            onItemClickCallback.onDeleteItem(checklist)
+        }
     }
 
     override fun getItemCount() = listChecklist.size
@@ -40,5 +44,6 @@ class ChecklistListAdapter(private val listChecklist: ArrayList<Checklist>) :
 
     interface OnItemClickCallback {
         fun onClickedItem(data: Checklist)
+        fun onDeleteItem(data: Checklist)
     }
 }

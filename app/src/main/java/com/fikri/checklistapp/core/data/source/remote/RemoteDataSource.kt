@@ -169,4 +169,45 @@ class RemoteDataSource(private val apiService: ApiService) {
             )
         }
     }
+
+    suspend fun deleteChecklist(
+        token: String,
+        checklistId: Int
+    ): ApiResultWrapper<DeleteChecklistResponse> {
+        val apiRequest = apiService.deleteChecklist("Bearer $token", checklistId)
+
+        try {
+            val response: Response<DeleteChecklistResponse> = apiRequest.awaitResponse()
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+                return if (responseBody != null) {
+                    ApiResultWrapper.Success(responseBody, responseBody.message)
+                } else {
+                    ApiResultWrapper.Error(
+                        response.code(),
+                        ResponseModal.TYPE_FAILED,
+                        "Broken Data"
+                    )
+                }
+            } else {
+                var errorMessage: String? = null
+                try {
+                    val jObjError = JSONObject(response.errorBody()!!.string())
+                    errorMessage = jObjError.getString("message")
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                return ApiResultWrapper.Error(
+                    response.code(),
+                    ResponseModal.TYPE_MISTAKE,
+                    "${response.message()} | $errorMessage"
+                )
+            }
+        } catch (e: IOException) {
+            return ApiResultWrapper.NetworkError(
+                ResponseModal.TYPE_ERROR,
+                "Connection Failed"
+            )
+        }
+    }
 }

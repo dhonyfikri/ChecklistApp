@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fikri.checklistapp.core.data.source.Resource
+import com.fikri.checklistapp.core.data.source.remote.response.ApiResultWrapper
 import com.fikri.checklistapp.core.domain.model.Checklist
 import com.fikri.checklistapp.core.domain.model.Token
 import com.fikri.checklistapp.core.ui.adapter.ChecklistListAdapter
@@ -60,6 +61,24 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
         }
+
+        viewModel.deleteChecklistResponse.observe(this@HomeActivity) {
+            it.getContentIfNotHandled()?.let { response ->
+                when (response) {
+                    is ApiResultWrapper.Success -> {
+                        viewModel.getChecklistList()
+                    }
+                    is ApiResultWrapper.Error -> {
+                        Toast.makeText(this@HomeActivity, response.message, Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                    is ApiResultWrapper.NetworkError -> {
+                        Toast.makeText(this@HomeActivity, "Connection Failed", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+            }
+        }
     }
 
     private fun setupAction() {
@@ -95,6 +114,10 @@ class HomeActivity : AppCompatActivity() {
             ChecklistListAdapter.OnItemClickCallback {
             override fun onClickedItem(data: Checklist) {
                 Toast.makeText(this@HomeActivity, data.name, Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onDeleteItem(data: Checklist) {
+                viewModel.deleteChecklist(data.id ?: -1)
             }
         })
     }

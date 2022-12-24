@@ -12,4 +12,9 @@ class ChecklistInteractor(private val checklistRepository: IChecklistRepository)
         token: String,
         body: CreateChecklistBody
     ) = checklistRepository.createChecklist(token, body)
+
+    override suspend fun deleteChecklist(
+        token: String,
+        checklistId: Int
+    ) = checklistRepository.deleteChecklist(token, checklistId)
 }
