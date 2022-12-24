@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.fikri.checklistapp.core.data.source.remote.response.ApiResultWrapper
+import com.fikri.checklistapp.core.domain.model.Token
 import com.fikri.checklistapp.databinding.ActivityMainBinding
 import com.fikri.checklistapp.view_model.MainViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -22,12 +23,12 @@ class MainActivity : AppCompatActivity() {
             loginData.observe(this@MainActivity) {
                 when (it) {
                     is ApiResultWrapper.Success -> {
-                        Toast.makeText(
-                            this@MainActivity,
-                            "Token: ${it.response.data?.token.toString()}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        startActivity(Intent(this@MainActivity, HomeActivity::class.java))
+                        val token = Token(it.response.data?.token)
+                        val moveToHome =
+                            Intent(this@MainActivity, HomeActivity::class.java)
+                        moveToHome.putExtra(HomeActivity.EXTRA_TOKEN, token)
+                        startActivity(moveToHome)
+                        finish()
                     }
                     else -> {
                         Toast.makeText(this@MainActivity, "Login Gagal", Toast.LENGTH_SHORT).show()

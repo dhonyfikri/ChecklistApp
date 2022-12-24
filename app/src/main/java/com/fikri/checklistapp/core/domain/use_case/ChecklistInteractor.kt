@@ -5,6 +5,9 @@ import com.fikri.checklistapp.core.domain.respository_interface.IChecklistReposi
 
 class ChecklistInteractor(private val checklistRepository: IChecklistRepository) :
     ChecklistUseCase {
+    override suspend fun getChecklistList(token: String) =
+        checklistRepository.getChecklistList(token)
+
     override suspend fun createChecklist(
         token: String,
         body: CreateChecklistBody
