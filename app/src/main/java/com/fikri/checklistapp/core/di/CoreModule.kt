@@ -13,8 +13,5 @@ object CoreModule {
     val repositoryModule = module {
         single { RemoteDataSource(get()) }
         single<IAuthRepository> { AuthRepository(get()) }
-//        single<IGenreRepository> { GenreRepository(get()) }
-//        single<IMovieRepository> { MovieRepository(get()) }
-//        single<IVideoRepository> { VideoRepository(get()) }
     }
 }
