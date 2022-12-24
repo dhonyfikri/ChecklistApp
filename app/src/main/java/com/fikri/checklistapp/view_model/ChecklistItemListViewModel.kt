@@ -5,6 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fikri.checklistapp.core.data.source.Resource
+import com.fikri.checklistapp.core.data.source.remote.body_params.CreateChecklistItemBody
+import com.fikri.checklistapp.core.data.source.remote.response.ApiResultWrapper
+import com.fikri.checklistapp.core.data.source.remote.response.CreateChecklistItemResponse
 import com.fikri.checklistapp.core.domain.model.Checklist
 import com.fikri.checklistapp.core.domain.model.ChecklistItem
 import com.fikri.checklistapp.core.domain.model.Token
@@ -20,6 +23,12 @@ class ChecklistItemListViewModel(private val checklistItemUseCase: ChecklistItem
         MutableLiveData(Event(true))
     private val _checklistItemList = MutableLiveData<Resource<ChecklistItem>>()
     val checklistItemList: LiveData<Resource<ChecklistItem>> = _checklistItemList
+    private val _createChecklistItemResponse =
+        MutableLiveData<ApiResultWrapper<CreateChecklistItemResponse>>()
+    val createChecklistItemResponse: LiveData<ApiResultWrapper<CreateChecklistItemResponse>> =
+        _createChecklistItemResponse
+    private val _showingAddModal = MutableLiveData<Boolean>()
+    val showingAddModal: LiveData<Boolean> = _showingAddModal
 //    private val _deleteChecklistResponse =
 //        MutableLiveData<Event<ApiResultWrapper<DeleteChecklistResponse>>>()
 //    val deleteChecklistResponse: LiveData<Event<ApiResultWrapper<DeleteChecklistResponse>>> =
@@ -40,6 +49,21 @@ class ChecklistItemListViewModel(private val checklistItemUseCase: ChecklistItem
         }
     }
 
+    fun createChecklistItem(name: String) {
+        val createChecklistItemBody = CreateChecklistItemBody(name)
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val result =
+                    checklistItemUseCase.createChecklistItem(
+                        token?.token ?: "",
+                        selectedChecklist?.id ?: -1,
+                        createChecklistItemBody
+                    )
+                _createChecklistItemResponse.postValue(result)
+            }
+        }
+    }
+
 //    fun deleteChecklist(checklistId: Int) {
 //        viewModelScope.launch {
 //            withContext(Dispatchers.IO) {
@@ -48,4 +72,8 @@ class ChecklistItemListViewModel(private val checklistItemUseCase: ChecklistItem
 //            }
 //        }
 //    }
+
+    fun setShowingAddModal(isShowing: Boolean) {
+        _showingAddModal.value = isShowing
+    }
 }

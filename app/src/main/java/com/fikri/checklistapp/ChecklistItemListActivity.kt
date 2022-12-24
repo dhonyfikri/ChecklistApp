@@ -5,10 +5,12 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fikri.checklistapp.core.data.source.Resource
+import com.fikri.checklistapp.core.data.source.remote.response.ApiResultWrapper
 import com.fikri.checklistapp.core.domain.model.Checklist
 import com.fikri.checklistapp.core.domain.model.ChecklistItem
 import com.fikri.checklistapp.core.domain.model.Token
 import com.fikri.checklistapp.core.ui.adapter.ChecklistItemListAdapter
+import com.fikri.checklistapp.core.ui.modal.AddChecklistItemModal
 import com.fikri.checklistapp.databinding.ActivityChecklistItemListBinding
 import com.fikri.checklistapp.view_model.ChecklistItemListViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -21,6 +23,7 @@ class ChecklistItemListActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityChecklistItemListBinding
     private val viewModel: ChecklistItemListViewModel by viewModel()
+    private val addChecklistItemModal = AddChecklistItemModal(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,10 +80,52 @@ class ChecklistItemListActivity : AppCompatActivity() {
                 }
             }
         }
+
+        viewModel.createChecklistItemResponse.observe(this) {
+            when (it) {
+                is ApiResultWrapper.Success -> {
+                    Toast.makeText(this@ChecklistItemListActivity, it.message, Toast.LENGTH_SHORT)
+                        .show()
+                    viewModel.getChecklistItemList()
+                }
+                is ApiResultWrapper.Error -> {
+                    Toast.makeText(this@ChecklistItemListActivity, it.message, Toast.LENGTH_SHORT)
+                        .show()
+                }
+                is ApiResultWrapper.NetworkError -> {
+                    Toast.makeText(
+                        this@ChecklistItemListActivity,
+                        "Connection Failed",
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                }
+                else -> {
+                    // do something
+                }
+            }
+        }
+
+        viewModel.showingAddModal.observe(this) {
+            if (it) {
+                addChecklistItemModal.showAddChecklistItemModal(
+                    onCancelClicked = {
+                        viewModel.setShowingAddModal(false)
+                    },
+                    onSaveClicked = { newItemName ->
+                        viewModel.setShowingAddModal(false)
+                        viewModel.createChecklistItem(newItemName)
+                    })
+            } else {
+                addChecklistItemModal.dismiss()
+            }
+        }
     }
 
     private fun setupAction() {
-
+        binding.fabCreateNewChecklistItem.setOnClickListener {
+            viewModel.setShowingAddModal(true)
+        }
     }
 
     private fun setChecklistItemList(checklistItemList: ArrayList<ChecklistItem>) {
@@ -99,5 +144,10 @@ class ChecklistItemListActivity : AppCompatActivity() {
             }
 
         })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.setShowingAddModal(false)
     }
 }

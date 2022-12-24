@@ -15,13 +15,32 @@
         android:paddingHorizontal="16dp"
         android:paddingVertical="8dp">
 
+        <ImageButton
+            android:id="@+id/btn_toggle_checklist_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:background="#00000000"
+            android:src="@drawable/ic_check" />
+
         <TextView
             android:id="@+id/tv_checklist_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
             android:layout_weight="1"
             android:textSize="18sp"
             tools:text="Name" />
+
+        <ImageButton
+            android:id="@+id/btn_edit_checklist_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:layout_marginEnd="8dp"
+            android:background="#00000000"
+            android:src="@drawable/ic_edit"
+            app:tint="@color/blue" />
 
         <ImageButton
             android:id="@+id/btn_delete_checklist"

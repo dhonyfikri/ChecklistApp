@@ -2,7 +2,9 @@ package com.fikri.checklistapp.core.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.fikri.checklistapp.R
 import com.fikri.checklistapp.core.domain.model.ChecklistItem
 import com.fikri.checklistapp.databinding.ChecklistItemBinding
 
@@ -24,6 +26,12 @@ class ChecklistItemListAdapter(private val listChecklistItem: ArrayList<Checklis
         holder.apply {
             binding.apply {
                 tvChecklistName.text = checklistItem.name
+                btnToggleChecklistStatus.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        holder.itemView.context,
+                        if (checklistItem.itemCompletionStatus == true) R.drawable.ic_check else R.drawable.ic_close
+                    )
+                )
             }
         }
 
