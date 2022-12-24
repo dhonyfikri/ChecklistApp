@@ -42,4 +42,10 @@ class ChecklistItemRepository(private val remoteDataSource: RemoteDataSource) :
         checklistId: Int,
         body: CreateChecklistItemBody
     ) = remoteDataSource.createChecklistItem(token, checklistId, body)
+
+    override suspend fun deleteChecklistItem(
+        token: String,
+        checklistId: Int,
+        checklistItemId: Int
+    ) = remoteDataSource.deleteChecklistItem(token, checklistId, checklistItemId)
 }

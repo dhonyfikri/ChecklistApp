@@ -106,6 +106,32 @@ class ChecklistItemListActivity : AppCompatActivity() {
             }
         }
 
+        viewModel.deleteChecklistItemResponse.observe(this@ChecklistItemListActivity) {
+            it.getContentIfNotHandled()?.let { response ->
+                when (response) {
+                    is ApiResultWrapper.Success -> {
+                        viewModel.getChecklistItemList()
+                    }
+                    is ApiResultWrapper.Error -> {
+                        Toast.makeText(
+                            this@ChecklistItemListActivity,
+                            response.message,
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                    }
+                    is ApiResultWrapper.NetworkError -> {
+                        Toast.makeText(
+                            this@ChecklistItemListActivity,
+                            "Connection Failed",
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                    }
+                }
+            }
+        }
+
         viewModel.showingAddModal.observe(this) {
             if (it) {
                 addChecklistItemModal.showAddChecklistItemModal(
@@ -140,7 +166,7 @@ class ChecklistItemListActivity : AppCompatActivity() {
             }
 
             override fun onDeleteItem(data: ChecklistItem) {
-                TODO("Not yet implemented")
+                viewModel.deleteChecklistItem(data.id ?: -1)
             }
 
         })

@@ -48,4 +48,11 @@ interface ApiService {
         @Path("checklist_id") checklistId: Int,
         @Body body: CreateChecklistItemBody
     ): Call<CreateChecklistItemResponse>
+
+    @DELETE("checklist/{checklist_id}/item/{checklist_item_id}")
+    fun deleteChecklistItem(
+        @Header("Authorization") token: String,
+        @Path("checklist_id") checklistId: Int,
+        @Path("checklist_item_id") checklistItemId: Int
+    ): Call<DeleteChecklistItemResponse>
 }

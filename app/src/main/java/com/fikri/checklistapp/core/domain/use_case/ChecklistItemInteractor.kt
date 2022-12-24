@@ -15,4 +15,10 @@ class ChecklistItemInteractor(private val checklistItemRepository: IChecklistIte
         checklistId: Int,
         body: CreateChecklistItemBody
     ) = checklistItemRepository.createChecklistItem(token, checklistId, body)
+
+    override suspend fun deleteChecklistItem(
+        token: String,
+        checklistId: Int,
+        checklistItemId: Int
+    ) = checklistItemRepository.deleteChecklistItem(token, checklistId, checklistItemId)
 }

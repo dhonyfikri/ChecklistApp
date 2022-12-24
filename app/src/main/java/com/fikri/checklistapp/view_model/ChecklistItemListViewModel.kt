@@ -8,6 +8,7 @@ import com.fikri.checklistapp.core.data.source.Resource
 import com.fikri.checklistapp.core.data.source.remote.body_params.CreateChecklistItemBody
 import com.fikri.checklistapp.core.data.source.remote.response.ApiResultWrapper
 import com.fikri.checklistapp.core.data.source.remote.response.CreateChecklistItemResponse
+import com.fikri.checklistapp.core.data.source.remote.response.DeleteChecklistItemResponse
 import com.fikri.checklistapp.core.domain.model.Checklist
 import com.fikri.checklistapp.core.domain.model.ChecklistItem
 import com.fikri.checklistapp.core.domain.model.Token
@@ -29,10 +30,10 @@ class ChecklistItemListViewModel(private val checklistItemUseCase: ChecklistItem
         _createChecklistItemResponse
     private val _showingAddModal = MutableLiveData<Boolean>()
     val showingAddModal: LiveData<Boolean> = _showingAddModal
-//    private val _deleteChecklistResponse =
-//        MutableLiveData<Event<ApiResultWrapper<DeleteChecklistResponse>>>()
-//    val deleteChecklistResponse: LiveData<Event<ApiResultWrapper<DeleteChecklistResponse>>> =
-//        _deleteChecklistResponse
+    private val _deleteChecklistItemResponse =
+        MutableLiveData<Event<ApiResultWrapper<DeleteChecklistItemResponse>>>()
+    val deleteChecklistItemResponse: LiveData<Event<ApiResultWrapper<DeleteChecklistItemResponse>>> =
+        _deleteChecklistItemResponse
 
     var selectedChecklist: Checklist? = null
     var token: Token? = null
@@ -64,14 +65,18 @@ class ChecklistItemListViewModel(private val checklistItemUseCase: ChecklistItem
         }
     }
 
-//    fun deleteChecklist(checklistId: Int) {
-//        viewModelScope.launch {
-//            withContext(Dispatchers.IO) {
-//                val result = checklistUseCase.deleteChecklist(token?.token ?: "", checklistId)
-//                _deleteChecklistResponse.postValue(Event(result))
-//            }
-//        }
-//    }
+    fun deleteChecklistItem(checklistItemId: Int) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val result = checklistItemUseCase.deleteChecklistItem(
+                    token?.token ?: "",
+                    selectedChecklist?.id ?: -1,
+                    checklistItemId
+                )
+                _deleteChecklistItemResponse.postValue(Event(result))
+            }
+        }
+    }
 
     fun setShowingAddModal(isShowing: Boolean) {
         _showingAddModal.value = isShowing
