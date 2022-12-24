@@ -45,6 +45,14 @@ class HomeActivity : AppCompatActivity() {
             viewModel.token = intent.getParcelableExtra<Token>(EXTRA_TOKEN) as Token
         }
 
+        viewModel.initialGetChecklistList.observe(this@HomeActivity) {
+            it.getContentIfNotHandled()?.let { isInitializing ->
+                if (isInitializing) {
+                    viewModel.getChecklistList()
+                }
+            }
+        }
+
         viewModel.checklistList.observe(this) {
             when (it) {
                 is Resource.Success -> {
@@ -104,14 +112,24 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setChecklistList(checklistList: ArrayList<Checklist>) {
-        val reversedChecklistList = checklistList.reversed() as ArrayList
-        val checklistListAdapter = ChecklistListAdapter(reversedChecklistList)
+        checklistList.reverse()
+        val checklistListAdapter = ChecklistListAdapter(checklistList)
         binding.rvChecklistList.adapter = checklistListAdapter
 
         checklistListAdapter.setOnItemClickCallback(object :
             ChecklistListAdapter.OnItemClickCallback {
             override fun onClickedItem(data: Checklist) {
-                Toast.makeText(this@HomeActivity, data.name, Toast.LENGTH_SHORT).show()
+                val moveChecklistItemList =
+                    Intent(this@HomeActivity, ChecklistItemListActivity::class.java)
+                moveChecklistItemList.putExtra(
+                    ChecklistItemListActivity.EXTRA_TOKEN,
+                    viewModel.token
+                )
+                moveChecklistItemList.putExtra(
+                    ChecklistItemListActivity.EXTRA_SELECTED_CHECKLIST,
+                    data
+                )
+                startActivity(moveChecklistItemList)
             }
 
             override fun onDeleteItem(data: Checklist) {

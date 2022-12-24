@@ -1,6 +1,7 @@
 package com.fikri.checklistapp.core.data.source.remote.network
 
 import com.fikri.checklistapp.core.data.source.remote.body_params.CreateChecklistBody
+import com.fikri.checklistapp.core.data.source.remote.body_params.CreateChecklistItemBody
 import com.fikri.checklistapp.core.data.source.remote.body_params.LoginBody
 import com.fikri.checklistapp.core.data.source.remote.body_params.RegisterBody
 import com.fikri.checklistapp.core.data.source.remote.response.*
@@ -40,4 +41,11 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Path("checklist_id") checklistId: Int
     ): Call<ChecklistItemListResponse>
+
+    @POST("checklist/{checklist_id}/item")
+    fun createChecklistItem(
+        @Header("Authorization") token: String,
+        @Path("checklist_id") checklistId: Int,
+        @Body body: CreateChecklistItemBody
+    ): Call<CreateChecklistItemResponse>
 }

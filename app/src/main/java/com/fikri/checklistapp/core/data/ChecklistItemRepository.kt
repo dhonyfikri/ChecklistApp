@@ -2,6 +2,7 @@ package com.fikri.checklistapp.core.data
 
 import com.fikri.checklistapp.core.data.source.Resource
 import com.fikri.checklistapp.core.data.source.remote.RemoteDataSource
+import com.fikri.checklistapp.core.data.source.remote.body_params.CreateChecklistItemBody
 import com.fikri.checklistapp.core.data.source.remote.response.ApiResultWrapper
 import com.fikri.checklistapp.core.domain.model.ChecklistItem
 import com.fikri.checklistapp.core.domain.respository_interface.IChecklistItemRepository
@@ -35,4 +36,10 @@ class ChecklistItemRepository(private val remoteDataSource: RemoteDataSource) :
             }
         }
     }
+
+    override suspend fun createChecklistItem(
+        token: String,
+        checklistId: Int,
+        body: CreateChecklistItemBody
+    ) = remoteDataSource.createChecklistItem(token, checklistId, body)
 }

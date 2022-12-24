@@ -16,6 +16,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class HomeViewModel(private val checklistUseCase: ChecklistUseCase) : ViewModel() {
+    val initialGetChecklistList: LiveData<Event<Boolean>> =
+        MutableLiveData(Event(true))
     private val _checklistList = MutableLiveData<Resource<Checklist>>()
     val checklistList: LiveData<Resource<Checklist>> = _checklistList
     private val _deleteChecklistResponse =
@@ -24,10 +26,6 @@ class HomeViewModel(private val checklistUseCase: ChecklistUseCase) : ViewModel(
         _deleteChecklistResponse
 
     var token: Token? = null
-
-    init {
-        getChecklistList()
-    }
 
     fun getChecklistList() {
         viewModelScope.launch {

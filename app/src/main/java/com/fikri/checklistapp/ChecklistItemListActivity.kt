@@ -1,10 +1,14 @@
 package com.fikri.checklistapp
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.fikri.checklistapp.core.data.source.Resource
 import com.fikri.checklistapp.core.domain.model.Checklist
+import com.fikri.checklistapp.core.domain.model.ChecklistItem
 import com.fikri.checklistapp.core.domain.model.Token
+import com.fikri.checklistapp.core.ui.adapter.ChecklistItemListAdapter
 import com.fikri.checklistapp.databinding.ActivityChecklistItemListBinding
 import com.fikri.checklistapp.view_model.ChecklistItemListViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -28,6 +32,7 @@ class ChecklistItemListActivity : AppCompatActivity() {
     }
 
     private fun setupData() {
+
         binding.apply {
             rvChecklistItemList.setHasFixedSize(true)
             rvChecklistItemList.layoutManager =
@@ -44,10 +49,55 @@ class ChecklistItemListActivity : AppCompatActivity() {
         if (intent.getParcelableExtra<Checklist>(EXTRA_SELECTED_CHECKLIST) != null) {
             viewModel.selectedChecklist =
                 intent.getParcelableExtra<Checklist>(EXTRA_SELECTED_CHECKLIST) as Checklist
+            title = "Item by ${viewModel.selectedChecklist?.name}"
+        }
+
+        viewModel.initialGetChecklistItemList.observe(this@ChecklistItemListActivity) {
+            it.getContentIfNotHandled()?.let { isInitializing ->
+                if (isInitializing) {
+                    viewModel.getChecklistItemList()
+                }
+            }
+        }
+
+        viewModel.checklistItemList.observe(this) {
+            when (it) {
+                is Resource.Success -> {
+                    setChecklistItemList(it.data as ArrayList<ChecklistItem>)
+                }
+                is Resource.Error -> {
+                    Toast.makeText(this@ChecklistItemListActivity, it.message, Toast.LENGTH_SHORT)
+                        .show()
+                }
+                is Resource.NetworkError -> {
+                    Toast.makeText(this, "Connection Failed", Toast.LENGTH_SHORT).show()
+                }
+                else -> {
+                    // to do something
+                }
+            }
         }
     }
 
     private fun setupAction() {
 
+    }
+
+    private fun setChecklistItemList(checklistItemList: ArrayList<ChecklistItem>) {
+        checklistItemList.reverse()
+        val checklistItemListAdapter = ChecklistItemListAdapter(checklistItemList)
+        binding.rvChecklistItemList.adapter = checklistItemListAdapter
+
+        checklistItemListAdapter.setOnItemClickCallback(object :
+            ChecklistItemListAdapter.OnItemClickCallback {
+            override fun onClickedItem(data: ChecklistItem) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onDeleteItem(data: ChecklistItem) {
+                TODO("Not yet implemented")
+            }
+
+        })
     }
 }
