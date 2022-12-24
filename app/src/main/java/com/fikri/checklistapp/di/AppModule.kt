@@ -1,13 +1,7 @@
 package com.fikri.checklistapp.di
 
-import com.fikri.checklistapp.core.domain.use_case.AuthInteractor
-import com.fikri.checklistapp.core.domain.use_case.AuthUseCase
-import com.fikri.checklistapp.core.domain.use_case.ChecklistInteractor
-import com.fikri.checklistapp.core.domain.use_case.ChecklistUseCase
-import com.fikri.checklistapp.view_model.CreateChecklistViewModel
-import com.fikri.checklistapp.view_model.HomeViewModel
-import com.fikri.checklistapp.view_model.MainViewModel
-import com.fikri.checklistapp.view_model.RegisterViewModel
+import com.fikri.checklistapp.core.domain.use_case.*
+import com.fikri.checklistapp.view_model.*
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -15,6 +9,7 @@ object AppModule {
     val useCaseModule = module {
         factory<AuthUseCase> { AuthInteractor(get()) }
         factory<ChecklistUseCase> { ChecklistInteractor(get()) }
+        factory<ChecklistItemUseCase> { ChecklistItemInteractor(get()) }
     }
 
     val viewModelModule = module {
@@ -22,5 +17,6 @@ object AppModule {
         viewModel { RegisterViewModel(get()) }
         viewModel { HomeViewModel(get()) }
         viewModel { CreateChecklistViewModel(get()) }
+        viewModel { ChecklistItemListViewModel(get()) }
     }
 }

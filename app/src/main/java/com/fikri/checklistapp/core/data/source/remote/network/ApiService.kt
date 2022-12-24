@@ -34,4 +34,10 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Path("checklist_id") checklistId: Int
     ): Call<DeleteChecklistResponse>
+
+    @GET("checklist/{checklist_id}/item")
+    fun getChecklistItemList(
+        @Header("Authorization") token: String,
+        @Path("checklist_id") checklistId: Int
+    ): Call<ChecklistItemListResponse>
 }

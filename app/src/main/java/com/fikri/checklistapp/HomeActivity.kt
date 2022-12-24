@@ -87,9 +87,7 @@ class HomeActivity : AppCompatActivity() {
                 val moveCreateChecklist =
                     Intent(this@HomeActivity, CreateChecklistActivity::class.java)
                 moveCreateChecklist.putExtra(CreateChecklistActivity.EXTRA_TOKEN, viewModel.token)
-                launcherIntentCreateChecklist.launch(
-                    Intent(moveCreateChecklist)
-                )
+                launcherIntentCreateChecklist.launch(moveCreateChecklist)
             }
         }
     }

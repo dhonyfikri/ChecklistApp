@@ -1,4 +1,4 @@
-package com.fikri.checklistapp.core.domain.respository_interface
+package com.fikri.checklistapp.core.domain.use_case
 
 import com.fikri.checklistapp.core.data.source.Resource
 import com.fikri.checklistapp.core.data.source.remote.body_params.CreateChecklistBody
@@ -8,16 +8,6 @@ import com.fikri.checklistapp.core.data.source.remote.response.DeleteChecklistRe
 import com.fikri.checklistapp.core.domain.model.Checklist
 import com.fikri.checklistapp.core.domain.model.ChecklistItem
 
-interface IChecklistRepository {
-    suspend fun getChecklistList(token: String): Resource<Checklist>
-
-    suspend fun createChecklist(
-        token: String,
-        body: CreateChecklistBody
-    ): ApiResultWrapper<CreateChecklistResponse>
-
-    suspend fun deleteChecklist(
-        token: String,
-        checklistId: Int
-    ): ApiResultWrapper<DeleteChecklistResponse>
+interface ChecklistItemUseCase {
+    suspend fun getChecklistItemList(token: String, checklistId: Int): Resource<ChecklistItem>
 }

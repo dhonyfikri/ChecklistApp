@@ -5,6 +5,7 @@ import com.fikri.checklistapp.core.data.source.remote.RemoteDataSource
 import com.fikri.checklistapp.core.data.source.remote.body_params.CreateChecklistBody
 import com.fikri.checklistapp.core.data.source.remote.response.ApiResultWrapper
 import com.fikri.checklistapp.core.domain.model.Checklist
+import com.fikri.checklistapp.core.domain.model.ChecklistItem
 import com.fikri.checklistapp.core.domain.respository_interface.IChecklistRepository
 
 class ChecklistRepository(private val remoteDataSource: RemoteDataSource) : IChecklistRepository {
@@ -13,8 +14,20 @@ class ChecklistRepository(private val remoteDataSource: RemoteDataSource) : IChe
             is ApiResultWrapper.Success -> {
                 val checklistList: ArrayList<Checklist> = arrayListOf()
                 result.response.data.map {
+                    val checklistItem = ArrayList<ChecklistItem>()
+                    it.items?.let { items ->
+                        items.forEach { data ->
+                            checklistItem.add(
+                                ChecklistItem(
+                                    data.id,
+                                    data.name,
+                                    data.itemCompletionStatus
+                                )
+                            )
+                        }
+                    }
                     checklistList.add(
-                        Checklist(it.id, it.name, it.items, it.checklistCompletionStatus)
+                        Checklist(it.id, it.name, checklistItem, it.checklistCompletionStatus)
                     )
                 }
                 return Resource.Success(checklistList)

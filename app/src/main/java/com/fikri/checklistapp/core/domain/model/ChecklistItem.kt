@@ -4,9 +4,8 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class Checklist(
+data class ChecklistItem(
     var id: Int? = null,
     var name: String? = null,
-    var items: ArrayList<ChecklistItem>? = null,
-    var checklistCompletionStatus: Boolean? = null
+    var itemCompletionStatus: Boolean? = null
 ) : Parcelable
