@@ -15,6 +15,12 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel.login("sixdhonyreff", "dhony123")
+        binding.apply {
+            btnLogin.setOnClickListener {
+                val username = etUsername.text.toString()
+                val password = etPassword.text.toString()
+                viewModel.login(username, password)
+            }
+        }
     }
 }
