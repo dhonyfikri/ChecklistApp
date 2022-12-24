@@ -1,9 +1,11 @@
 package com.fikri.checklistapp.core.data.source.remote
 
+import com.fikri.checklistapp.core.data.source.remote.body_params.CreateChecklistBody
 import com.fikri.checklistapp.core.data.source.remote.body_params.LoginBody
 import com.fikri.checklistapp.core.data.source.remote.body_params.RegisterBody
 import com.fikri.checklistapp.core.data.source.remote.network.ApiService
 import com.fikri.checklistapp.core.data.source.remote.response.ApiResultWrapper
+import com.fikri.checklistapp.core.data.source.remote.response.CreateChecklistResponse
 import com.fikri.checklistapp.core.data.source.remote.response.LoginResponse
 import com.fikri.checklistapp.core.data.source.remote.response.RegisterResponse
 import com.fikri.checklistapp.core.ui.modal.ResponseModal
@@ -60,7 +62,48 @@ class RemoteDataSource(private val apiService: ApiService) {
             if (response.isSuccessful) {
                 val responseBody = response.body()
                 return if (responseBody != null) {
-                    ApiResultWrapper.Success(responseBody, "Success Login")
+                    ApiResultWrapper.Success(responseBody, "Success Register")
+                } else {
+                    ApiResultWrapper.Error(
+                        response.code(),
+                        ResponseModal.TYPE_FAILED,
+                        "Broken Data"
+                    )
+                }
+            } else {
+                var errorMessage: String? = null
+                try {
+                    val jObjError = JSONObject(response.errorBody()!!.string())
+                    errorMessage = jObjError.getString("message")
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                return ApiResultWrapper.Error(
+                    response.code(),
+                    ResponseModal.TYPE_MISTAKE,
+                    "${response.message()} | $errorMessage"
+                )
+            }
+        } catch (e: IOException) {
+            return ApiResultWrapper.NetworkError(
+                ResponseModal.TYPE_ERROR,
+                "Connection Failed"
+            )
+        }
+    }
+
+    suspend fun createChecklist(
+        token: String,
+        body: CreateChecklistBody
+    ): ApiResultWrapper<CreateChecklistResponse> {
+        val apiRequest = apiService.createChecklist("Bearer $token", body)
+
+        try {
+            val response: Response<CreateChecklistResponse> = apiRequest.awaitResponse()
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+                return if (responseBody != null) {
+                    ApiResultWrapper.Success(responseBody, "Success Create Checlist")
                 } else {
                     ApiResultWrapper.Error(
                         response.code(),
