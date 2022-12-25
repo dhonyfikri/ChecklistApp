@@ -12,6 +12,7 @@ import com.fikri.checklistapp.core.domain.model.Token
 import com.fikri.checklistapp.core.ui.adapter.ChecklistItemListAdapter
 import com.fikri.checklistapp.core.ui.modal.AddChecklistItemModal
 import com.fikri.checklistapp.core.ui.modal.DetailChecklistItemModal
+import com.fikri.checklistapp.core.ui.modal.UpdateChecklistItemModal
 import com.fikri.checklistapp.databinding.ActivityChecklistItemListBinding
 import com.fikri.checklistapp.view_model.ChecklistItemListViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -26,6 +27,7 @@ class ChecklistItemListActivity : AppCompatActivity() {
     private val viewModel: ChecklistItemListViewModel by viewModel()
     private val addChecklistItemModal = AddChecklistItemModal(this)
     private val detailModal = DetailChecklistItemModal(this)
+    private val updateModal = UpdateChecklistItemModal(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -160,6 +162,32 @@ class ChecklistItemListActivity : AppCompatActivity() {
             }
         }
 
+        viewModel.updateStatusChecklistItemResponse.observe(this@ChecklistItemListActivity) {
+            it.getContentIfNotHandled()?.let { response ->
+                when (response) {
+                    is ApiResultWrapper.Success -> {
+                        viewModel.getChecklistItemList()
+                    }
+                    is ApiResultWrapper.Error -> {
+                        Toast.makeText(
+                            this@ChecklistItemListActivity,
+                            response.message,
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                    }
+                    is ApiResultWrapper.NetworkError -> {
+                        Toast.makeText(
+                            this@ChecklistItemListActivity,
+                            "Connection Failed",
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                    }
+                }
+            }
+        }
+
         viewModel.showingAddModal.observe(this) {
             if (it) {
                 addChecklistItemModal.showAddChecklistItemModal(
@@ -180,9 +208,30 @@ class ChecklistItemListActivity : AppCompatActivity() {
             }
         }
 
+        viewModel.showingUpdateModal.observe(this) {
+            if (it) {
+                updateModal.showUpdateChecklistItemModal(
+                    viewModel.selectedChecklistItem,
+                    viewModel.currentUpdateChecklistName,
+                    onNameChange = { currentName ->
+                        viewModel.currentUpdateChecklistName = currentName
+                    },
+                    onCancelClicked = {
+                        viewModel.setShowingUpdateModal(false)
+                    },
+                    onUpdateClicked = { checklistItemId, newItemName ->
+                        viewModel.setShowingUpdateModal(false)
+                        viewModel.updateChecklistItem(checklistItemId, newItemName)
+                    })
+            } else {
+                updateModal.dismiss()
+                viewModel.currentUpdateChecklistName = null
+            }
+        }
+
         viewModel.showingDetailModal.observe(this) {
             if (it) {
-                detailModal.showAddChecklistItemModal(
+                detailModal.showDetailChecklistItemModal(
                     viewModel.detailChecklistItem,
                     onCancelClicked = {
                         viewModel.dismissDetailModal()
@@ -215,6 +264,11 @@ class ChecklistItemListActivity : AppCompatActivity() {
                 viewModel.getDetailChecklistItem(data.id ?: -1)
             }
 
+            override fun onUpdateItem(data: ChecklistItem) {
+                viewModel.selectedChecklistItem = data
+                viewModel.setShowingUpdateModal(true)
+            }
+
             override fun onDeleteItem(data: ChecklistItem) {
                 viewModel.deleteChecklistItem(data.id ?: -1)
             }
@@ -226,5 +280,6 @@ class ChecklistItemListActivity : AppCompatActivity() {
         super.onDestroy()
         addChecklistItemModal.dismiss()
         detailModal.dismiss()
+        updateModal.dismiss()
     }
 }

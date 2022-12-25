@@ -3,6 +3,7 @@ package com.fikri.checklistapp.core.data
 import com.fikri.checklistapp.core.data.source.Resource
 import com.fikri.checklistapp.core.data.source.remote.RemoteDataSource
 import com.fikri.checklistapp.core.data.source.remote.body_params.CreateChecklistItemBody
+import com.fikri.checklistapp.core.data.source.remote.body_params.UpdateChecklistItemBody
 import com.fikri.checklistapp.core.data.source.remote.response.ApiResultWrapper
 import com.fikri.checklistapp.core.domain.model.ChecklistItem
 import com.fikri.checklistapp.core.domain.respository_interface.IChecklistItemRepository
@@ -84,4 +85,11 @@ class ChecklistItemRepository(private val remoteDataSource: RemoteDataSource) :
         checklistId: Int,
         checklistItemId: Int
     ) = remoteDataSource.updateStatusChecklistItem(token, checklistId, checklistItemId)
+
+    override suspend fun updateNameChecklistItem(
+        token: String,
+        checklistId: Int,
+        checklistItemId: Int,
+        body: UpdateChecklistItemBody
+    ) = remoteDataSource.updateNameChecklistItem(token, checklistId, checklistItemId, body)
 }

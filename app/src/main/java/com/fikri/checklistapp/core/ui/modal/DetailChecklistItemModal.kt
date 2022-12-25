@@ -9,7 +9,7 @@ import com.fikri.checklistapp.core.domain.model.ChecklistItem
 
 class DetailChecklistItemModal(private val context: Context) : MyModal() {
 
-    fun showAddChecklistItemModal(
+    fun showDetailChecklistItemModal(
         checklistItem: ChecklistItem?,
         onCancelClicked: (() -> Unit)? = null,
         onUpdateStatusClicked: ((checklistItemId: Int) -> Unit)? = null

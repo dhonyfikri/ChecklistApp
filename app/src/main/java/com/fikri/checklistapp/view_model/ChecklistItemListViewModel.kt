@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fikri.checklistapp.core.data.source.Resource
 import com.fikri.checklistapp.core.data.source.remote.body_params.CreateChecklistItemBody
+import com.fikri.checklistapp.core.data.source.remote.body_params.UpdateChecklistItemBody
 import com.fikri.checklistapp.core.data.source.remote.response.ApiResultWrapper
 import com.fikri.checklistapp.core.data.source.remote.response.CreateChecklistItemResponse
 import com.fikri.checklistapp.core.data.source.remote.response.DeleteChecklistItemResponse
@@ -39,13 +40,21 @@ class ChecklistItemListViewModel(private val checklistItemUseCase: ChecklistItem
         MutableLiveData<Event<ApiResultWrapper<UpdateChecklistItemResponse>>>()
     val updateChecklistItemResponse: LiveData<Event<ApiResultWrapper<UpdateChecklistItemResponse>>> =
         _updateChecklistItemResponse
+    private val _updateStatusChecklistItemResponse =
+        MutableLiveData<Event<ApiResultWrapper<UpdateChecklistItemResponse>>>()
+    val updateStatusChecklistItemResponse: LiveData<Event<ApiResultWrapper<UpdateChecklistItemResponse>>> =
+        _updateStatusChecklistItemResponse
     private val _showingDetailModal = MutableLiveData<Boolean>()
     val showingDetailModal: LiveData<Boolean> = _showingDetailModal
+    private val _showingUpdateModal = MutableLiveData<Boolean>()
+    val showingUpdateModal: LiveData<Boolean> = _showingUpdateModal
 
     var detailChecklistItem: ChecklistItem? = null
     var selectedChecklist: Checklist? = null
+    var selectedChecklistItem: ChecklistItem? = null
     var token: Token? = null
     var currentAddChecklistName = ""
+    var currentUpdateChecklistName: String? = null
 
     fun getChecklistItemList() {
         viewModelScope.launch {
@@ -108,6 +117,21 @@ class ChecklistItemListViewModel(private val checklistItemUseCase: ChecklistItem
         }
     }
 
+    fun updateChecklistItem(checklistItemId: Int, newName: String) {
+        val updateChecklistItemBody = UpdateChecklistItemBody(newName)
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val result = checklistItemUseCase.updateNameChecklistItem(
+                    token?.token ?: "",
+                    selectedChecklist?.id ?: -1,
+                    checklistItemId,
+                    updateChecklistItemBody
+                )
+                _updateChecklistItemResponse.postValue(Event(result))
+            }
+        }
+    }
+
     fun updateStatusChecklistItem(checklistItemId: Int) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -116,7 +140,7 @@ class ChecklistItemListViewModel(private val checklistItemUseCase: ChecklistItem
                     selectedChecklist?.id ?: -1,
                     checklistItemId
                 )
-                _updateChecklistItemResponse.postValue(Event(result))
+                _updateStatusChecklistItemResponse.postValue(Event(result))
             }
         }
     }
@@ -127,5 +151,9 @@ class ChecklistItemListViewModel(private val checklistItemUseCase: ChecklistItem
 
     fun dismissDetailModal() {
         _showingDetailModal.value = false
+    }
+
+    fun setShowingUpdateModal(isShowing: Boolean) {
+        _showingUpdateModal.value = isShowing
     }
 }

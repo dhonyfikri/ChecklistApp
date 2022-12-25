@@ -3,6 +3,7 @@ package com.fikri.checklistapp.core.domain.use_case
 import com.fikri.checklistapp.core.data.source.Resource
 import com.fikri.checklistapp.core.data.source.remote.body_params.CreateChecklistBody
 import com.fikri.checklistapp.core.data.source.remote.body_params.CreateChecklistItemBody
+import com.fikri.checklistapp.core.data.source.remote.body_params.UpdateChecklistItemBody
 import com.fikri.checklistapp.core.data.source.remote.response.*
 import com.fikri.checklistapp.core.domain.model.Checklist
 import com.fikri.checklistapp.core.domain.model.ChecklistItem
@@ -32,5 +33,12 @@ interface ChecklistItemUseCase {
         token: String,
         checklistId: Int,
         checklistItemId: Int
+    ): ApiResultWrapper<UpdateChecklistItemResponse>
+
+    suspend fun updateNameChecklistItem(
+        token: String,
+        checklistId: Int,
+        checklistItemId: Int,
+        body: UpdateChecklistItemBody
     ): ApiResultWrapper<UpdateChecklistItemResponse>
 }

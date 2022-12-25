@@ -39,6 +39,10 @@ class ChecklistItemListAdapter(private val listChecklistItem: ArrayList<Checklis
             onItemClickCallback.onClickedItem(checklistItem)
         }
 
+        holder.binding.btnEditChecklistItem.setOnClickListener {
+            onItemClickCallback.onUpdateItem(checklistItem)
+        }
+
         holder.binding.btnDeleteChecklist.setOnClickListener {
             onItemClickCallback.onDeleteItem(checklistItem)
         }
@@ -52,6 +56,7 @@ class ChecklistItemListAdapter(private val listChecklistItem: ArrayList<Checklis
 
     interface OnItemClickCallback {
         fun onClickedItem(data: ChecklistItem)
+        fun onUpdateItem(data: ChecklistItem)
         fun onDeleteItem(data: ChecklistItem)
     }
 }

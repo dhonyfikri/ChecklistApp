@@ -14,4 +14,6 @@
     <string name="detail_checklist_item">Detail Checklist Item</string>
     <string name="set_completed">Set Completed</string>
     <string name="set_uncompleted">Set Uncompleted</string>
+    <string name="update_checklist_item">Update Checklist Item</string>
+    <string name="update">Update</string>
 </resources>
