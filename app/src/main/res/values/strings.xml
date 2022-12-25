@@ -16,4 +16,5 @@
     <string name="set_uncompleted">Set Uncompleted</string>
     <string name="update_checklist_item">Update Checklist Item</string>
     <string name="update">Update</string>
+    <string name="add_new_checklist">Add New Checklist</string>
 </resources>

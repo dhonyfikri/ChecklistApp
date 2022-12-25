@@ -48,6 +48,8 @@ class ChecklistItemListViewModel(private val checklistItemUseCase: ChecklistItem
     val showingDetailModal: LiveData<Boolean> = _showingDetailModal
     private val _showingUpdateModal = MutableLiveData<Boolean>()
     val showingUpdateModal: LiveData<Boolean> = _showingUpdateModal
+    private val _updatedActivity = MutableLiveData(false)
+    val updatedActivity: LiveData<Boolean> = _updatedActivity
 
     var detailChecklistItem: ChecklistItem? = null
     var selectedChecklist: Checklist? = null
@@ -143,6 +145,10 @@ class ChecklistItemListViewModel(private val checklistItemUseCase: ChecklistItem
                 _updateStatusChecklistItemResponse.postValue(Event(result))
             }
         }
+    }
+
+    fun setUpdatedActivity() {
+        _updatedActivity.value = true
     }
 
     fun setShowingAddModal(isShowing: Boolean) {

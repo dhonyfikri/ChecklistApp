@@ -32,6 +32,8 @@ class CreateChecklistActivity : AppCompatActivity() {
             viewModel.token = intent.getParcelableExtra<Token>(EXTRA_TOKEN) as Token
         }
 
+        title = getString(R.string.add_new_checklist)
+
         viewModel.createChecklistListResponse.observe(this@CreateChecklistActivity) {
             when (it) {
                 is ApiResultWrapper.Success -> {

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fikri.checklistapp.core.data.source.Resource
 import com.fikri.checklistapp.core.data.source.remote.response.ApiResultWrapper
@@ -17,8 +18,10 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeActivity : AppCompatActivity() {
     companion object {
-        const val CREATE_CHECKLIST_RESULT = 100
+        const val CREATE_CHECKLIST_RESULT = 110
         const val CREATE_CHECKLIST_STATUS_RESULT = "create_checklist_status_result"
+        const val UPDATE_CHECKLIST_ITEM_RESULT = 100
+        const val UPDATE_CHECKLIST_ITEM_STATUS_RESULT = "update_checklist_item_status_result"
         const val EXTRA_TOKEN = "extra_token"
     }
 
@@ -97,6 +100,19 @@ class HomeActivity : AppCompatActivity() {
                 moveCreateChecklist.putExtra(CreateChecklistActivity.EXTRA_TOKEN, viewModel.token)
                 launcherIntentCreateChecklist.launch(moveCreateChecklist)
             }
+
+            srlHome.apply {
+                setColorSchemeColors(
+                    ContextCompat.getColor(
+                        this@HomeActivity,
+                        R.color.secondary_color
+                    )
+                )
+                setOnRefreshListener {
+                    isRefreshing = false
+                    viewModel.getChecklistList()
+                }
+            }
         }
     }
 
@@ -111,9 +127,23 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    private val launcherIntentUpdateChecklistItem = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == UPDATE_CHECKLIST_ITEM_RESULT) {
+            val isUpdated = result.data?.getBooleanExtra(UPDATE_CHECKLIST_ITEM_STATUS_RESULT, false)
+            if (isUpdated != null && isUpdated) {
+                viewModel.getChecklistList()
+            }
+        }
+    }
+
     private fun setChecklistList(checklistList: ArrayList<Checklist>) {
-        checklistList.reverse()
-        val checklistListAdapter = ChecklistListAdapter(checklistList)
+        var reversedChecklistList = checklistList
+        if (checklistList.isNotEmpty() && checklistList.size > 1) {
+            reversedChecklistList = checklistList.reversed() as ArrayList<Checklist>
+        }
+        val checklistListAdapter = ChecklistListAdapter(reversedChecklistList)
         binding.rvChecklistList.adapter = checklistListAdapter
 
         checklistListAdapter.setOnItemClickCallback(object :
@@ -129,7 +159,7 @@ class HomeActivity : AppCompatActivity() {
                     ChecklistItemListActivity.EXTRA_SELECTED_CHECKLIST,
                     data
                 )
-                startActivity(moveChecklistItemList)
+                launcherIntentUpdateChecklistItem.launch(moveChecklistItemList)
             }
 
             override fun onDeleteItem(data: Checklist) {

@@ -1,8 +1,10 @@
 package com.fikri.checklistapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fikri.checklistapp.core.data.source.Resource
 import com.fikri.checklistapp.core.data.source.remote.response.ApiResultWrapper
@@ -88,9 +90,8 @@ class ChecklistItemListActivity : AppCompatActivity() {
         viewModel.createChecklistItemResponse.observe(this) {
             when (it) {
                 is ApiResultWrapper.Success -> {
-                    Toast.makeText(this@ChecklistItemListActivity, it.message, Toast.LENGTH_SHORT)
-                        .show()
                     viewModel.getChecklistItemList()
+                    viewModel.setUpdatedActivity()
                 }
                 is ApiResultWrapper.Error -> {
                     Toast.makeText(this@ChecklistItemListActivity, it.message, Toast.LENGTH_SHORT)
@@ -115,6 +116,7 @@ class ChecklistItemListActivity : AppCompatActivity() {
                 when (response) {
                     is ApiResultWrapper.Success -> {
                         viewModel.getChecklistItemList()
+                        viewModel.setUpdatedActivity()
                     }
                     is ApiResultWrapper.Error -> {
                         Toast.makeText(
@@ -141,6 +143,7 @@ class ChecklistItemListActivity : AppCompatActivity() {
                 when (response) {
                     is ApiResultWrapper.Success -> {
                         viewModel.getChecklistItemList()
+                        viewModel.setUpdatedActivity()
                     }
                     is ApiResultWrapper.Error -> {
                         Toast.makeText(
@@ -167,6 +170,7 @@ class ChecklistItemListActivity : AppCompatActivity() {
                 when (response) {
                     is ApiResultWrapper.Success -> {
                         viewModel.getChecklistItemList()
+                        viewModel.setUpdatedActivity()
                     }
                     is ApiResultWrapper.Error -> {
                         Toast.makeText(
@@ -245,17 +249,39 @@ class ChecklistItemListActivity : AppCompatActivity() {
                 detailModal.dismiss()
             }
         }
+
+        viewModel.updatedActivity.observe(this) {
+            setActivityResult(it)
+        }
     }
 
     private fun setupAction() {
-        binding.fabCreateNewChecklistItem.setOnClickListener {
-            viewModel.setShowingAddModal(true)
+        binding.apply {
+            fabCreateNewChecklistItem.setOnClickListener {
+                viewModel.setShowingAddModal(true)
+            }
+
+            srlChecklistItem.apply {
+                setColorSchemeColors(
+                    ContextCompat.getColor(
+                        this@ChecklistItemListActivity,
+                        R.color.secondary_color
+                    )
+                )
+                setOnRefreshListener {
+                    isRefreshing = false
+                    viewModel.getChecklistItemList()
+                }
+            }
         }
     }
 
     private fun setChecklistItemList(checklistItemList: ArrayList<ChecklistItem>) {
-        checklistItemList.reverse()
-        val checklistItemListAdapter = ChecklistItemListAdapter(checklistItemList)
+        var reversedChecklistItemList = checklistItemList
+        if (checklistItemList.isNotEmpty() && checklistItemList.size > 1) {
+            reversedChecklistItemList = checklistItemList.reversed() as ArrayList<ChecklistItem>
+        }
+        val checklistItemListAdapter = ChecklistItemListAdapter(reversedChecklistItemList)
         binding.rvChecklistItemList.adapter = checklistItemListAdapter
 
         checklistItemListAdapter.setOnItemClickCallback(object :
@@ -274,6 +300,12 @@ class ChecklistItemListActivity : AppCompatActivity() {
             }
 
         })
+    }
+
+    private fun setActivityResult(isUpdated: Boolean) {
+        val intent = Intent()
+        intent.putExtra(HomeActivity.UPDATE_CHECKLIST_ITEM_STATUS_RESULT, isUpdated)
+        setResult(HomeActivity.UPDATE_CHECKLIST_ITEM_RESULT, intent)
     }
 
     override fun onDestroy() {
