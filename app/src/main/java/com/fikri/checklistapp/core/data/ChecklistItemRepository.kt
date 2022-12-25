@@ -48,4 +48,40 @@ class ChecklistItemRepository(private val remoteDataSource: RemoteDataSource) :
         checklistId: Int,
         checklistItemId: Int
     ) = remoteDataSource.deleteChecklistItem(token, checklistId, checklistItemId)
+
+    override suspend fun getDetailChecklistItem(
+        token: String,
+        checklistId: Int,
+        checklistItemId: Int
+    ): Resource<ChecklistItem> {
+        when (val result =
+            remoteDataSource.getDetailChecklistItem(token, checklistId, checklistItemId)) {
+            is ApiResultWrapper.Success -> {
+                val checklistItem = ChecklistItem()
+                result.response.data.let {
+                    checklistItem.id = it.id
+                    checklistItem.name = it.name
+                    checklistItem.itemCompletionStatus = it.itemCompletionStatus
+                }
+                return Resource.Success(arrayListOf(checklistItem))
+            }
+            is ApiResultWrapper.Error -> {
+                val code: Int? = result.code
+                val failedType: String? = result.failedType
+                val message: String? = result.message
+                return Resource.Error(code, failedType, message)
+            }
+            is ApiResultWrapper.NetworkError -> {
+                val failedType: String? = result.failedType
+                val message: String? = result.message
+                return Resource.NetworkError(failedType, message)
+            }
+        }
+    }
+
+    override suspend fun updateStatusChecklistItem(
+        token: String,
+        checklistId: Int,
+        checklistItemId: Int
+    ) = remoteDataSource.updateStatusChecklistItem(token, checklistId, checklistItemId)
 }

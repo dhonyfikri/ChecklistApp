@@ -9,6 +9,7 @@ import com.fikri.checklistapp.core.data.source.remote.body_params.CreateChecklis
 import com.fikri.checklistapp.core.data.source.remote.response.ApiResultWrapper
 import com.fikri.checklistapp.core.data.source.remote.response.CreateChecklistItemResponse
 import com.fikri.checklistapp.core.data.source.remote.response.DeleteChecklistItemResponse
+import com.fikri.checklistapp.core.data.source.remote.response.UpdateChecklistItemResponse
 import com.fikri.checklistapp.core.domain.model.Checklist
 import com.fikri.checklistapp.core.domain.model.ChecklistItem
 import com.fikri.checklistapp.core.domain.model.Token
@@ -34,9 +35,17 @@ class ChecklistItemListViewModel(private val checklistItemUseCase: ChecklistItem
         MutableLiveData<Event<ApiResultWrapper<DeleteChecklistItemResponse>>>()
     val deleteChecklistItemResponse: LiveData<Event<ApiResultWrapper<DeleteChecklistItemResponse>>> =
         _deleteChecklistItemResponse
+    private val _updateChecklistItemResponse =
+        MutableLiveData<Event<ApiResultWrapper<UpdateChecklistItemResponse>>>()
+    val updateChecklistItemResponse: LiveData<Event<ApiResultWrapper<UpdateChecklistItemResponse>>> =
+        _updateChecklistItemResponse
+    private val _showingDetailModal = MutableLiveData<Boolean>()
+    val showingDetailModal: LiveData<Boolean> = _showingDetailModal
 
+    var detailChecklistItem: ChecklistItem? = null
     var selectedChecklist: Checklist? = null
     var token: Token? = null
+    var currentAddChecklistName = ""
 
     fun getChecklistItemList() {
         viewModelScope.launch {
@@ -78,7 +87,45 @@ class ChecklistItemListViewModel(private val checklistItemUseCase: ChecklistItem
         }
     }
 
+    fun getDetailChecklistItem(checklistItemId: Int) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val result = checklistItemUseCase.getDetailChecklistItem(
+                    token?.token ?: "",
+                    selectedChecklist?.id ?: -1,
+                    checklistItemId
+                )
+                when (result) {
+                    is Resource.Success -> {
+                        detailChecklistItem = result.data[0]
+                        _showingDetailModal.postValue(true)
+                    }
+                    else -> {
+                        // do something
+                    }
+                }
+            }
+        }
+    }
+
+    fun updateStatusChecklistItem(checklistItemId: Int) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val result = checklistItemUseCase.updateStatusChecklistItem(
+                    token?.token ?: "",
+                    selectedChecklist?.id ?: -1,
+                    checklistItemId
+                )
+                _updateChecklistItemResponse.postValue(Event(result))
+            }
+        }
+    }
+
     fun setShowingAddModal(isShowing: Boolean) {
         _showingAddModal.value = isShowing
+    }
+
+    fun dismissDetailModal() {
+        _showingDetailModal.value = false
     }
 }

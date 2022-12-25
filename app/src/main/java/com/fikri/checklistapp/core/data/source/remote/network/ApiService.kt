@@ -1,9 +1,6 @@
 package com.fikri.checklistapp.core.data.source.remote.network
 
-import com.fikri.checklistapp.core.data.source.remote.body_params.CreateChecklistBody
-import com.fikri.checklistapp.core.data.source.remote.body_params.CreateChecklistItemBody
-import com.fikri.checklistapp.core.data.source.remote.body_params.LoginBody
-import com.fikri.checklistapp.core.data.source.remote.body_params.RegisterBody
+import com.fikri.checklistapp.core.data.source.remote.body_params.*
 import com.fikri.checklistapp.core.data.source.remote.response.*
 import retrofit2.Call
 import retrofit2.http.*
@@ -55,4 +52,26 @@ interface ApiService {
         @Path("checklist_id") checklistId: Int,
         @Path("checklist_item_id") checklistItemId: Int
     ): Call<DeleteChecklistItemResponse>
+
+    @GET("checklist/{checklist_id}/item/{checklist_item_id}")
+    fun getDetailChecklistItem(
+        @Header("Authorization") token: String,
+        @Path("checklist_id") checklistId: Int,
+        @Path("checklist_item_id") checklistItemId: Int
+    ): Call<DetailChecklistItemResponse>
+
+    @PUT("checklist/{checklist_id}/item/{checklist_item_id}")
+    fun updateStatusChecklistItem(
+        @Header("Authorization") token: String,
+        @Path("checklist_id") checklistId: Int,
+        @Path("checklist_item_id") checklistItemId: Int
+    ): Call<UpdateChecklistItemResponse>
+
+    @PUT("checklist/{checklist_id}/item/rename/{checklist_item_id}")
+    fun updateNameChecklistItem(
+        @Header("Authorization") token: String,
+        @Path("checklist_id") checklistId: Int,
+        @Path("checklist_item_id") checklistItemId: Int,
+        @Body body: UpdateChecklistItemBody
+    ): Call<UpdateChecklistItemResponse>
 }

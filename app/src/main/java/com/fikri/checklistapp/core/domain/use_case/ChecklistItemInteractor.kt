@@ -21,4 +21,16 @@ class ChecklistItemInteractor(private val checklistItemRepository: IChecklistIte
         checklistId: Int,
         checklistItemId: Int
     ) = checklistItemRepository.deleteChecklistItem(token, checklistId, checklistItemId)
+
+    override suspend fun getDetailChecklistItem(
+        token: String,
+        checklistId: Int,
+        checklistItemId: Int
+    ) = checklistItemRepository.getDetailChecklistItem(token, checklistId, checklistItemId)
+
+    override suspend fun updateStatusChecklistItem(
+        token: String,
+        checklistId: Int,
+        checklistItemId: Int
+    ) = checklistItemRepository.updateStatusChecklistItem(token, checklistId, checklistItemId)
 }

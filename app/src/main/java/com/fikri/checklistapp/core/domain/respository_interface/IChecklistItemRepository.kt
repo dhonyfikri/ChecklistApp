@@ -5,6 +5,7 @@ import com.fikri.checklistapp.core.data.source.remote.body_params.CreateChecklis
 import com.fikri.checklistapp.core.data.source.remote.response.ApiResultWrapper
 import com.fikri.checklistapp.core.data.source.remote.response.CreateChecklistItemResponse
 import com.fikri.checklistapp.core.data.source.remote.response.DeleteChecklistItemResponse
+import com.fikri.checklistapp.core.data.source.remote.response.UpdateChecklistItemResponse
 import com.fikri.checklistapp.core.domain.model.ChecklistItem
 
 interface IChecklistItemRepository {
@@ -21,4 +22,16 @@ interface IChecklistItemRepository {
         checklistId: Int,
         checklistItemId: Int
     ): ApiResultWrapper<DeleteChecklistItemResponse>
+
+    suspend fun getDetailChecklistItem(
+        token: String,
+        checklistId: Int,
+        checklistItemId: Int
+    ): Resource<ChecklistItem>
+
+    suspend fun updateStatusChecklistItem(
+        token: String,
+        checklistId: Int,
+        checklistItemId: Int
+    ): ApiResultWrapper<UpdateChecklistItemResponse>
 }

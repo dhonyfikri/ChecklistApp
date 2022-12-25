@@ -11,6 +11,7 @@ import com.fikri.checklistapp.core.domain.model.ChecklistItem
 import com.fikri.checklistapp.core.domain.model.Token
 import com.fikri.checklistapp.core.ui.adapter.ChecklistItemListAdapter
 import com.fikri.checklistapp.core.ui.modal.AddChecklistItemModal
+import com.fikri.checklistapp.core.ui.modal.DetailChecklistItemModal
 import com.fikri.checklistapp.databinding.ActivityChecklistItemListBinding
 import com.fikri.checklistapp.view_model.ChecklistItemListViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -24,6 +25,7 @@ class ChecklistItemListActivity : AppCompatActivity() {
     private lateinit var binding: ActivityChecklistItemListBinding
     private val viewModel: ChecklistItemListViewModel by viewModel()
     private val addChecklistItemModal = AddChecklistItemModal(this)
+    private val detailModal = DetailChecklistItemModal(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -132,9 +134,39 @@ class ChecklistItemListActivity : AppCompatActivity() {
             }
         }
 
+        viewModel.updateChecklistItemResponse.observe(this@ChecklistItemListActivity) {
+            it.getContentIfNotHandled()?.let { response ->
+                when (response) {
+                    is ApiResultWrapper.Success -> {
+                        viewModel.getChecklistItemList()
+                    }
+                    is ApiResultWrapper.Error -> {
+                        Toast.makeText(
+                            this@ChecklistItemListActivity,
+                            response.message,
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                    }
+                    is ApiResultWrapper.NetworkError -> {
+                        Toast.makeText(
+                            this@ChecklistItemListActivity,
+                            "Connection Failed",
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                    }
+                }
+            }
+        }
+
         viewModel.showingAddModal.observe(this) {
             if (it) {
                 addChecklistItemModal.showAddChecklistItemModal(
+                    viewModel.currentAddChecklistName,
+                    onNameChange = { currentName ->
+                        viewModel.currentAddChecklistName = currentName
+                    },
                     onCancelClicked = {
                         viewModel.setShowingAddModal(false)
                     },
@@ -144,6 +176,24 @@ class ChecklistItemListActivity : AppCompatActivity() {
                     })
             } else {
                 addChecklistItemModal.dismiss()
+                viewModel.currentAddChecklistName = ""
+            }
+        }
+
+        viewModel.showingDetailModal.observe(this) {
+            if (it) {
+                detailModal.showAddChecklistItemModal(
+                    viewModel.detailChecklistItem,
+                    onCancelClicked = {
+                        viewModel.dismissDetailModal()
+                    },
+                    onUpdateStatusClicked = { checklistItemId ->
+                        viewModel.dismissDetailModal()
+                        viewModel.updateStatusChecklistItem(checklistItemId)
+                    }
+                )
+            } else {
+                detailModal.dismiss()
             }
         }
     }
@@ -162,7 +212,7 @@ class ChecklistItemListActivity : AppCompatActivity() {
         checklistItemListAdapter.setOnItemClickCallback(object :
             ChecklistItemListAdapter.OnItemClickCallback {
             override fun onClickedItem(data: ChecklistItem) {
-                TODO("Not yet implemented")
+                viewModel.getDetailChecklistItem(data.id ?: -1)
             }
 
             override fun onDeleteItem(data: ChecklistItem) {
@@ -174,6 +224,7 @@ class ChecklistItemListActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        viewModel.setShowingAddModal(false)
+        addChecklistItemModal.dismiss()
+        detailModal.dismiss()
     }
 }

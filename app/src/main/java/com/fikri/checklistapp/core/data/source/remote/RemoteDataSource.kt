@@ -1,9 +1,6 @@
 package com.fikri.checklistapp.core.data.source.remote
 
-import com.fikri.checklistapp.core.data.source.remote.body_params.CreateChecklistBody
-import com.fikri.checklistapp.core.data.source.remote.body_params.CreateChecklistItemBody
-import com.fikri.checklistapp.core.data.source.remote.body_params.LoginBody
-import com.fikri.checklistapp.core.data.source.remote.body_params.RegisterBody
+import com.fikri.checklistapp.core.data.source.remote.body_params.*
 import com.fikri.checklistapp.core.data.source.remote.network.ApiService
 import com.fikri.checklistapp.core.data.source.remote.response.*
 import com.fikri.checklistapp.core.ui.modal.ResponseModal
@@ -303,6 +300,136 @@ class RemoteDataSource(private val apiService: ApiService) {
 
         try {
             val response: Response<DeleteChecklistItemResponse> = apiRequest.awaitResponse()
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+                return if (responseBody != null) {
+                    ApiResultWrapper.Success(responseBody, responseBody.message)
+                } else {
+                    ApiResultWrapper.Error(
+                        response.code(),
+                        ResponseModal.TYPE_FAILED,
+                        "Broken Data"
+                    )
+                }
+            } else {
+                var errorMessage: String? = null
+                try {
+                    val jObjError = JSONObject(response.errorBody()!!.string())
+                    errorMessage = jObjError.getString("message")
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                return ApiResultWrapper.Error(
+                    response.code(),
+                    ResponseModal.TYPE_MISTAKE,
+                    "${response.message()} | $errorMessage"
+                )
+            }
+        } catch (e: IOException) {
+            return ApiResultWrapper.NetworkError(
+                ResponseModal.TYPE_ERROR,
+                "Connection Failed"
+            )
+        }
+    }
+
+    suspend fun getDetailChecklistItem(
+        token: String,
+        checklistId: Int,
+        checklistItemId: Int
+    ): ApiResultWrapper<DetailChecklistItemResponse> {
+        val apiRequest =
+            apiService.getDetailChecklistItem("Bearer $token", checklistId, checklistItemId)
+
+        try {
+            val response: Response<DetailChecklistItemResponse> = apiRequest.awaitResponse()
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+                return if (responseBody != null) {
+                    ApiResultWrapper.Success(responseBody, responseBody.message)
+                } else {
+                    ApiResultWrapper.Error(
+                        response.code(),
+                        ResponseModal.TYPE_FAILED,
+                        "Broken Data"
+                    )
+                }
+            } else {
+                var errorMessage: String? = null
+                try {
+                    val jObjError = JSONObject(response.errorBody()!!.string())
+                    errorMessage = jObjError.getString("message")
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                return ApiResultWrapper.Error(
+                    response.code(),
+                    ResponseModal.TYPE_MISTAKE,
+                    "${response.message()} | $errorMessage"
+                )
+            }
+        } catch (e: IOException) {
+            return ApiResultWrapper.NetworkError(
+                ResponseModal.TYPE_ERROR,
+                "Connection Failed"
+            )
+        }
+    }
+
+    suspend fun updateStatusChecklistItem(
+        token: String,
+        checklistId: Int,
+        checklistItemId: Int
+    ): ApiResultWrapper<UpdateChecklistItemResponse> {
+        val apiRequest =
+            apiService.updateStatusChecklistItem("Bearer $token", checklistId, checklistItemId)
+
+        try {
+            val response: Response<UpdateChecklistItemResponse> = apiRequest.awaitResponse()
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+                return if (responseBody != null) {
+                    ApiResultWrapper.Success(responseBody, responseBody.message)
+                } else {
+                    ApiResultWrapper.Error(
+                        response.code(),
+                        ResponseModal.TYPE_FAILED,
+                        "Broken Data"
+                    )
+                }
+            } else {
+                var errorMessage: String? = null
+                try {
+                    val jObjError = JSONObject(response.errorBody()!!.string())
+                    errorMessage = jObjError.getString("message")
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                return ApiResultWrapper.Error(
+                    response.code(),
+                    ResponseModal.TYPE_MISTAKE,
+                    "${response.message()} | $errorMessage"
+                )
+            }
+        } catch (e: IOException) {
+            return ApiResultWrapper.NetworkError(
+                ResponseModal.TYPE_ERROR,
+                "Connection Failed"
+            )
+        }
+    }
+
+    suspend fun updateNameChecklistItem(
+        token: String,
+        checklistId: Int,
+        checklistItemId: Int,
+        body: UpdateChecklistItemBody
+    ): ApiResultWrapper<UpdateChecklistItemResponse> {
+        val apiRequest =
+            apiService.updateNameChecklistItem("Bearer $token", checklistId, checklistItemId, body)
+
+        try {
+            val response: Response<UpdateChecklistItemResponse> = apiRequest.awaitResponse()
             if (response.isSuccessful) {
                 val responseBody = response.body()
                 return if (responseBody != null) {

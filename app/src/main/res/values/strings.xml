@@ -11,4 +11,7 @@
     <string name="item_name">Item Name</string>
     <string name="add_new_checklist_item">Add New Checklist Item</string>
     <string name="cancel">Cancel</string>
+    <string name="detail_checklist_item">Detail Checklist Item</string>
+    <string name="set_completed">Set Completed</string>
+    <string name="set_uncompleted">Set Uncompleted</string>
 </resources>

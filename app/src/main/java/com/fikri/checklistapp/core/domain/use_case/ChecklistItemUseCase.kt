@@ -21,4 +21,16 @@ interface ChecklistItemUseCase {
         checklistId: Int,
         checklistItemId: Int
     ): ApiResultWrapper<DeleteChecklistItemResponse>
+
+    suspend fun getDetailChecklistItem(
+        token: String,
+        checklistId: Int,
+        checklistItemId: Int
+    ): Resource<ChecklistItem>
+
+    suspend fun updateStatusChecklistItem(
+        token: String,
+        checklistId: Int,
+        checklistItemId: Int
+    ): ApiResultWrapper<UpdateChecklistItemResponse>
 }
